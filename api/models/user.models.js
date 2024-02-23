@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    avatar: {
+      type: String,
+      default:
+        "https://wisdomexperience.org/wp-content/uploads/2019/10/blank-profile-picture-973460_960_720.png",
+    },
   },
   { timestamps: true }
 );
