@@ -11,7 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 mongoose
-  .connect(process.env.MONGO)
+  .connect(
+    "mongodb+srv://vatssakshu:sakshamvats@mern-estate.zf5to5c.mongodb.net/mern-estate?retryWrites=true&w=majority&appName=mern-estate"
+  )
   .then(() => {
     console.log("Connected to MongoDB");
   })
@@ -24,10 +26,12 @@ app.listen(PORT, () => {
 });
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+
 app.use(cookieParser());
+
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
