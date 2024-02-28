@@ -26,11 +26,10 @@ app.listen(PORT, () => {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
-
-app.use(cookieParser());
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
