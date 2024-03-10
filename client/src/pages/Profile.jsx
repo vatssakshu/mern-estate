@@ -32,7 +32,8 @@ export default function Profile() {
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListingsError, setShowListingsError] = useState(false);
-  const [userListing, setUserListing] = useState([{}]);
+  const [userListing, setUserListing] = useState([]);
+  const [listingDeleteError, setListingDeleteError] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -138,6 +139,24 @@ export default function Profile() {
       setShowListingsError(true);
     }
   };
+
+  const handleListingDelete = async (id) => {
+    try {
+      setListingDeleteError(false);
+      const res = await fetch(`/api/listing/delete/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setListingDeleteError(false);
+        setUserListing((prev) => prev.filter((listing) => listing._id !== id));
+        return;
+      }
+      setUserListing(userListing.filter((listing) => listing._id !== id));
+    } catch (error) {
+      setListingDeleteError(true);
+    }
+  };
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -218,12 +237,15 @@ export default function Profile() {
       <p className="text-green-700 mt-5">
         {updateSuccess ? "User Updated Successfully" : ""}
       </p>
-      <button onClick={handleShowListings} className="text-green-700">
-        Show Listings
-      </button>
-      <p className="text-red-700 mt-5">
-        {showListingsError ? "Error fetching listings" : ""}
-      </p>
+      <div className="flex flex-col items-center">
+        <button onClick={handleShowListings} className="text-green-700 ">
+          Show Listings
+        </button>
+        <p className="text-red-700 mt-5">
+          {showListingsError ? "Error fetching listings" : ""}
+        </p>
+      </div>
+
       {userListing && userListing.length > 0 && (
         <div className="flex flex-col gap-4">
           <h1 className="text-center mt-7 text-3xl font-semibold">
@@ -236,7 +258,7 @@ export default function Profile() {
             >
               <Link to={`/listing/${listing._id}`}>
                 <img
-                  src={listing.imageUrls}
+                  src={listing.imageUrls[0]}
                   alt="listing-cover"
                   className="h-16 w-16 object-contain"
                 ></img>
@@ -249,9 +271,17 @@ export default function Profile() {
                 <p>{listing.name}</p>
               </Link>
               <div className="flex flex-col items-center">
-                <button className="text-red-700 uppercase">Delete</button>
+                <button
+                  className="text-red-700 uppercase"
+                  onClick={() => handleListingDelete(listing._id)}
+                >
+                  Delete
+                </button>
                 <button className="text-green-700 uppercase">Edit</button>
               </div>
+              <p className="text-red-700 mt-5">
+                {listingDeleteError ? "Error fetching listings" : ""}
+              </p>
             </div>
           ))}
         </div>
